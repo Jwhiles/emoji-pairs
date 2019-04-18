@@ -1,0 +1,17 @@
+{
+  "name": "emoji-pairs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "watch": "parcel index.html",
+    "build": "parcel build index.html"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "parcel": "^1.12.3",
+    "parcel-bundler": "^1.12.3",
+    "surge": "^0.20.3"
+  }
+}
