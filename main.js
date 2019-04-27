@@ -3,39 +3,60 @@ const emojis = require('./emojis.js');
 const second = 1000;
 const minute = 60 * second;
 
-const getRandomElement = arr => arr[Math.floor(Math.random() * arr.length)];
+const getRandomElement = arr => {
+  const i = Math.floor(Math.random() * arr.length);
+  const nustate = arr.slice(0, i).concat(arr.slice(i + 1));
+  return [arr[i], nustate];
+};
 
-const setContent = (element, content) => (element.innerText = content);
+const setContent = (element, state) => {
+  const [content, newState] = getRandomElement(state);
+  element.innerText = content;
+  return newState;
+};
 
 const emojiOne = document.getElementById('first');
 const emojiTwo = document.getElementById('second');
 
-updateEmojis = () => {
-  setContent(emojiOne, getRandomElement(emojis));
-  setContent(emojiTwo, getRandomElement(emojis));
-}
+updateEmojis = state => {
+  const state1 = setContent(emojiOne, state);
+  const state2 = setContent(emojiTwo, state1);
+  return state2;
+};
 
-const space = "Space"
-const enter = "Enter"
+const space = 'Space';
+const enter = 'Enter';
+const stop = 'KeyS';
 
-const keyboardControls = interval => e => {
-  switch(e.code) {
-    case enter:
-      clearInterval(interval);
-      updateEmojis();
-      interval = setInterval(updateEmojis, 5 * minute);
-      break;
-    default:
-      break;
-  }
-}
+const intervaller = f => setInterval(f, 5 * minute);
 
 const main = () => {
-  updateEmojis();
+  let state = emojis();
 
-  let interval = setInterval(updateEmojis, 5 * minute);
+  state = updateEmojis(state);
+
+  let interval = intervaller(() => {
+    state = updateEmojis(state);
+  });
+
+  const keyboardControls = interval => e => {
+    switch (e.code) {
+      case enter:
+        clearInterval(interval);
+        state = updateEmojis(state);
+        interval = intervaller(() => (state = updateEmojis(state)));
+        break;
+      case stop:
+        clearInterval(interval);
+        updateEmojis([' ', ' ']);
+        interval = intervaller(() => (state = updateEmojis(state)));
+        break;
+      default:
+        break;
+    }
+  };
 
   document.addEventListener('keypress', keyboardControls(interval));
-}
+};
 
 main();
